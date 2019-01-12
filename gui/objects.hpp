@@ -853,7 +853,7 @@ public:
 
 protected:
 	ImageResource* mEmptyBar;
-	ImageResource* mFullBar;
+	AnimationResource* mFullBar;
 	std::string mMinValVar;
 	std::string mMaxValVar;
 	std::string mCurValVar;
@@ -861,6 +861,8 @@ protected:
 	float mSlideInc;
 	int mSlideFrames;
 	int mLastPos;
+	int mFrame;
+	int mOneStepSize;
 
 protected:
 	virtual int RenderInternal(void);	   // Does the actual render

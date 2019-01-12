@@ -52,6 +52,7 @@ GUIProgressBar::GUIProgressBar(xml_node<>* node) : GUIObject(node)
 	mLastPos = 0;
 	mSlide = 0.0;
 	mSlideInc = 0.0;
+	mFrame = 0;
 
 	if (!node)
 	{
@@ -63,7 +64,7 @@ GUIProgressBar::GUIProgressBar(xml_node<>* node) : GUIObject(node)
 	if (child)
 	{
 		mEmptyBar = LoadAttrImage(child, "empty");
-		mFullBar = LoadAttrImage(child, "full");
+		mFullBar = LoadAttrAnimation(child, "full");
 	}
 
 	// Load the placement
@@ -84,6 +85,7 @@ GUIProgressBar::GUIProgressBar(xml_node<>* node) : GUIObject(node)
 	} else {
 		mRenderW = mRenderH = 0;
 	}
+	mOneStepSize = mRenderW / mFullBar->GetResourceCount();
 }
 
 int GUIProgressBar::Render(void)
@@ -101,11 +103,11 @@ int GUIProgressBar::RenderInternal(void)
 	if (!mEmptyBar || !mEmptyBar->GetResource())
 		return -1;
 
-	if (!mFullBar || !mFullBar->GetResource())
+	if (!mFullBar || !mFullBar->GetResource(mFrame))
 		return -1;
 
 	gr_blit(mEmptyBar->GetResource(), 0, 0, mRenderW, mRenderH, mRenderX, mRenderY);
-	gr_blit(mFullBar->GetResource(), 0, 0, mLastPos, mRenderH, mRenderX, mRenderY);
+	gr_blit(mFullBar->GetResource(mFrame), 0, 0, mRenderW, mRenderH, mRenderX, mRenderY);
 	return 0;
 }
 
@@ -177,6 +179,13 @@ int GUIProgressBar::Update(void)
 
 	mLastPos = pos;
 
+	for (int mIndexFrame = 0; mIndexFrame < mFullBar->GetResourceCount(); mIndexFrame++)
+		if (mLastPos > mOneStepSize * mIndexFrame && mLastPos < mOneStepSize * (mIndexFrame + 1))
+		{
+			mFrame = mIndexFrame;
+			break;		
+		}
+
 	if (RenderInternal() != 0)
 		return -1;
 	return 2;
@@ -195,6 +204,7 @@ int GUIProgressBar::NotifyVarChange(const std::string& varName, const std::strin
 	{
 		nextPush = 0;
 		mLastPos = 0;
+		mFrame = 0;
 		mSlide = 0.0;
 		mSlideInc = 0.0;
 		return 0;
