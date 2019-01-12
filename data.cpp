@@ -914,20 +914,10 @@ int DataManager::GetMagicValue(const string& varName, string& value)
 		now = time(0);
 		current = localtime(&now);
 		GetValue(TW_MILITARY_TIME, tw_military_time);
-		if (current->tm_hour >= 12)
-		{
-			if (tw_military_time == 1)
-				sprintf(tmp, "%d:%02d", current->tm_hour, current->tm_min);
-			else
-				sprintf(tmp, "%d:%02d PM", current->tm_hour == 12 ? 12 : current->tm_hour - 12, current->tm_min);
-		}
+		if (tw_military_time == 1)
+			sprintf(tmp, "%d:%02d", current->tm_hour, current->tm_min);
 		else
-		{
-			if (tw_military_time == 1)
-				sprintf(tmp, "%d:%02d", current->tm_hour, current->tm_min);
-			else
-				sprintf(tmp, "%d:%02d AM", current->tm_hour == 0 ? 12 : current->tm_hour, current->tm_min);
-		}
+			sprintf(tmp, "%d:%02d", current->tm_hour == 0 ? 00 : current->tm_hour, current->tm_min);
 		value = tmp;
 		return 0;
 	}
